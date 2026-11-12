@@ -1,17 +1,16 @@
 {
   "name": "calculadora",
-  "version": "1.0.0",
   "private": true,
-  "description": "Calculadora web (PWA)",
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js",
-    "build": "node build.js",
-    "preview": "node server.js dist"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite preview --host 0.0.0.0 --port ${PORT:-3000}"
   },
-  "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5"
+  }
 }

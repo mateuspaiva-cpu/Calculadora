@@ -10,17 +10,18 @@ Calculadora web que funciona como app (PWA): abre no navegador, pode ser instala
 - Atalhos de teclado: números, `+ - * /`, `Enter`, `Backspace`, `Esc`
 - Tema claro/escuro automático
 
-## Como publicar (GitHub Pages)
-1. No repositório: **Settings → Pages**
-2. Em *Source*, escolha **Deploy from a branch**, branch `main`, pasta `/ (root)`
-3. Acesse `https://<seu-usuario>.github.io/<nome-do-repositorio>/`
+## Rodar localmente
+```bash
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # gera a pasta dist/
+```
+
+## Google AI Studio
+Projeto no formato Vite + TypeScript (com `metadata.json`), pronto para importar do GitHub no Google AI Studio.
+
+## Publicar (Vercel / Netlify)
+Build: `npm run build` · Output: `dist`
 
 ## Instalar no celular
 Abra o link no navegador → menu → **Adicionar à tela inicial**.
-
-## Rodar com Node (opcional)
-```bash
-npm install
-npm run dev     # abre em http://localhost:3000
-npm run build   # gera a pasta dist/
-```

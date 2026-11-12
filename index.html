@@ -7,44 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Calculadora">
 <title>Calculadora</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon.svg">
-<style>
-  :root{
-    --bg:#f1f5f9; --card:#ffffff; --text:#0f172a; --muted:#64748b;
-    --key:#e2e8f0; --key-text:#0f172a; --fn:#cbd5e1; --op:#16a34a; --op-text:#fff; --eq:#15803d;
-    --shadow:0 10px 30px rgba(15,23,42,.12);
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#020617; --card:#0f172a; --text:#f8fafc; --muted:#94a3b8;
-      --key:#1e293b; --key-text:#f8fafc; --fn:#334155; --op:#22c55e; --op-text:#052e16; --eq:#16a34a;
-      --shadow:0 10px 30px rgba(0,0,0,.5);
-    }
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;height:100%}
-  body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-       display:flex;align-items:center;justify-content:center;padding:16px}
-  .calc{width:100%;max-width:380px;background:var(--card);border-radius:28px;padding:20px;box-shadow:var(--shadow)}
-  .display{min-height:120px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;
-           padding:8px 6px 16px;overflow:hidden}
-  .expr{color:var(--muted);font-size:1.05rem;min-height:1.4em;word-break:break-all;text-align:right}
-  .result{font-size:3rem;font-weight:600;line-height:1.1;word-break:break-all;text-align:right;font-variant-numeric:tabular-nums}
-  .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-  button{border:0;border-radius:18px;height:68px;font-size:1.5rem;font-weight:500;cursor:pointer;
-         background:var(--key);color:var(--key-text);transition:transform .06s,filter .15s;font-family:inherit}
-  button:active{transform:scale(.95);filter:brightness(.9)}
-  button:focus-visible{outline:3px solid var(--op);outline-offset:2px}
-  .fn{background:var(--fn)}
-  .op{background:var(--op);color:var(--op-text);font-size:1.7rem}
-  .eq{background:var(--eq);color:#fff}
-  .zero{grid-column:span 2}
-  .history{margin-top:16px;max-height:120px;overflow:auto;font-size:.9rem;color:var(--muted)}
-  .history div{text-align:right;padding:2px 6px;cursor:pointer}
-  .history div:hover{color:var(--text)}
-</style>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon.svg">
+<link rel="stylesheet" href="/index.css">
 </head>
 <body>
 <main class="calc" aria-label="Calculadora">
@@ -70,86 +36,6 @@
   </div>
   <div class="history" id="history" aria-label="Histórico"></div>
 </main>
-<script>
-(() => {
-  const SYM = {'/':'÷','*':'×','-':'−','+':'+'};
-  const $res = document.getElementById('result'), $expr = document.getElementById('expr'), $hist = document.getElementById('history');
-  let cur = '0', prev = null, op = null, fresh = false;
-
-  const fmt = n => {
-    if (typeof n === 'string') {
-      const [i, d] = n.split('.');
-      const neg = i.startsWith('-');
-      const int = Number(i.replace('-','')).toLocaleString('pt-BR');
-      return (neg ? '-' : '') + int + (d !== undefined ? ',' + d : '');
-    }
-    if (!isFinite(n)) return 'Erro';
-    return Number(n.toPrecision(12)).toLocaleString('pt-BR', {maximumFractionDigits: 10});
-  };
-  const calc = (a, b, o) => o==='+'?a+b : o==='-'?a-b : o==='*'?a*b : b===0?NaN : a/b;
-  const render = () => {
-    $res.textContent = fmt(cur);
-    $expr.textContent = prev !== null && op ? `${fmt(prev)} ${SYM[op]}` : '';
-    $res.style.fontSize = $res.textContent.length > 12 ? '2rem' : $res.textContent.length > 9 ? '2.4rem' : '3rem';
-  };
-  const addHistory = (text, value) => {
-    const d = document.createElement('div');
-    d.textContent = text; d.title = 'Usar este resultado';
-    d.onclick = () => { cur = String(value); fresh = true; render(); };
-    $hist.prepend(d);
-  };
-
-  const num = d => {
-    if (cur === 'NaN' || fresh) { cur = '0'; fresh = false; }
-    if (cur.replace(/[-.]/g,'').length >= 15) return;
-    cur = cur === '0' ? d : cur === '-0' ? '-' + d : cur + d;
-  };
-  const setOp = o => {
-    if (op && !fresh && prev !== null) {
-      const r = calc(prev, parseFloat(cur), op);
-      cur = String(Number(r.toPrecision(12)));
-    }
-    prev = parseFloat(cur); op = o; fresh = true;
-  };
-  const actions = {
-    clear(){ cur='0'; prev=null; op=null; fresh=false; },
-    back(){ if (fresh) return; cur = cur.length>1 && cur!=='-0' ? cur.slice(0,-1) : '0'; if (cur==='-') cur='0'; },
-    percent(){ const v = parseFloat(cur); cur = String(prev!==null && (op==='+'||op==='-') ? prev*v/100 : v/100); },
-    sign(){ cur = cur.startsWith('-') ? cur.slice(1) : '-' + cur; },
-    dot(){ if (fresh) { cur='0'; fresh=false; } if (!cur.includes('.')) cur += '.'; },
-    equals(){
-      if (op === null || prev === null) return;
-      const b = parseFloat(cur), r = calc(prev, b, op);
-      const text = `${fmt(prev)} ${SYM[op]} ${fmt(b)} = ${fmt(r)}`;
-      cur = isFinite(r) ? String(Number(r.toPrecision(12))) : 'NaN';
-      if (isFinite(r)) addHistory(text, cur);
-      prev = null; op = null; fresh = true;
-    }
-  };
-
-  document.querySelector('.keys').addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b) return;
-    if (b.dataset.num) num(b.dataset.num);
-    else if (b.dataset.op) setOp(b.dataset.op);
-    else actions[b.dataset.action]();
-    render();
-  });
-  document.addEventListener('keydown', e => {
-    const k = e.key;
-    if (/^[0-9]$/.test(k)) num(k);
-    else if ('+-*/'.includes(k)) setOp(k);
-    else if (k === 'Enter' || k === '=') { e.preventDefault(); actions.equals(); }
-    else if (k === ',' || k === '.') actions.dot();
-    else if (k === 'Backspace') actions.back();
-    else if (k === 'Escape') actions.clear();
-    else if (k === '%') actions.percent();
-    else return;
-    render();
-  });
-  render();
-
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-})();
-</script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>

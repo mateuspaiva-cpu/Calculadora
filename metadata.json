@@ -1,0 +1,5 @@
+{
+  "name": "Calculadora",
+  "description": "Calculadora visual em formato brasileiro, com histórico, atalhos de teclado e tema claro/escuro. Pode ser instalada como app.",
+  "requestFramePermissions": []
+}
