@@ -17,3 +17,10 @@ Calculadora web que funciona como app (PWA): abre no navegador, pode ser instala
 
 ## Instalar no celular
 Abra o link no navegador → menu → **Adicionar à tela inicial**.
+
+## Rodar com Node (opcional)
+```bash
+npm install
+npm run dev     # abre em http://localhost:3000
+npm run build   # gera a pasta dist/
+```
